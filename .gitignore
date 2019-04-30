@@ -1,0 +1,5 @@
+sendgrid.env
+environment
+/build
+/node_modules
+/.idea
