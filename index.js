@@ -25,11 +25,6 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cors())
 
-app.get('/', (req, res) => {
-  res.send('index');
-});
-
-
 app.post('/email', function (req, res) {
   console.log('lolol ', req.body)
   const msg = {
