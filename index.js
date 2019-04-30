@@ -153,6 +153,7 @@ app.get('/oauthcallback', async (req, res) => {
     tokens = (await oauth2Client.getToken(code)).tokens;
   } catch (e) {
     console.log(e);
+    return;
   }
 
   const oauth_info = await request("https://www.googleapis.com/oauth2/v1/userinfo?fields=email&oauth_token=" + tokens.access_token);
@@ -161,7 +162,8 @@ app.get('/oauthcallback', async (req, res) => {
   db.collection("integrations").add({
     type: "Google",
     display: userEmail,
-    uid: state
+    uid: state,
+    token: tokens.refresh_token
   });
 
   res.writeHead(302, {
