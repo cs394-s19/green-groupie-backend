@@ -161,7 +161,7 @@ app.get('/oauthcallback', async (req, res) => {
 
   console.log(tokens);
 
-  db.collection("integrations").add({
+  db.collection("profile-data").doc(state).collection('integrations').add({
     type: "Google",
     display: userEmail,
     uid: state,
