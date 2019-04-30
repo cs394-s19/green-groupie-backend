@@ -159,6 +159,8 @@ app.get('/oauthcallback', async (req, res) => {
   const oauth_info = await request("https://www.googleapis.com/oauth2/v1/userinfo?fields=email&oauth_token=" + tokens.access_token);
   const {email: userEmail} = JSON.parse(oauth_info);
 
+  console.log(tokens);
+
   db.collection("integrations").add({
     type: "Google",
     display: userEmail,
