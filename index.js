@@ -1,5 +1,5 @@
-const corealg = require('./scheduling-engine/core-algorithm');
-
+const corealg1 = require('./scheduling-engine/core-algorithm.js');
+const corealg2 = require('./scheduling-engine/findSlots.js');
 const express = require('express');  // call express
 const sgMail = require('@sendgrid/mail');
 const app = express(); // create a server
@@ -24,6 +24,11 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(cors())
+
+app.get('/', (req, res) => {
+  res.send('index');
+});
+
 
 app.post('/email', function (req, res) {
   console.log('lolol ', req.body)
@@ -50,8 +55,8 @@ app.post('/find-common-slots', (req, res)=>{
       duration: req.body.length 
     }
 
-
-    const result = corealg.divideChunks(userDefs)
+    console.log('its here')
+    const result = corealg1.divideChunks(userDefs)
     res.send(result)
     
 });
@@ -60,17 +65,28 @@ app.post('/match-meeting-time', async (req,res)=>{
   //const meetingID = req
 
   const db = firebaseAdmin.firestore();
-
-  const meetingID = '0xy1EdTXYZJR2mrCr0vt'
+  
+  const meetingID = 'OIBoO8adHBMK6krTbaHx'
   
   let meeting = await db.collection('meeting-proposals').doc(meetingID).get();
+  const userDefs = {
+    daily_str: meeting.get('start_time'),
+    daily_end: meeting.get('end_time'),
+    str: meeting.get('start_date'),
+    end: meeting.get('end_date'),
+    duration: meeting.get('duration')
+  }
+
   let emails = meeting.get('participants')
 
   console.log(emails);
 
+
   let uids = {};
   for (let email of emails) {
+    console.log('its here')
     const user = await firebaseAdmin.auth().getUserByEmail(email);
+    console.log('its not here')
     uids[email] = user.uid;
   }
   console.log(uids);
@@ -90,34 +106,40 @@ app.post('/match-meeting-time', async (req,res)=>{
     'http://' + REDIR_HOSTNAME + '/oauthcallback'
   );
 
-  for (const token of Object.values(tokens)){
-    oauth2Client.setCredentials(token);
-    console.log('token is', token)
-    const calendar = google.calendar({version: 'v3', oauth2Client});
-    calendar.events.list({
-      calendarId: 'primary',
-      singleEvents:true,
-    },(err, res) => {
-      if (err) return console.log('The API returned an error: ' + err);
-      const events = res.data.items;
-      if (events.length) {
-        console.log('events:');
-        all_events.push(events)
-        events.map((event, i) => {
-          const start = event.start.dateTime || event.start.date;
-          console.log(`${start} - ${event.summary}`);
-        });
-      } else {
-        console.log('No upcoming events found.');
-      }
-    }
-    )
-  }
+  // for (const token of Object.values(tokens)){
+  //   oauth2Client.setCredentials(token);
+  //   console.log('token is', token)
+  //   const calendar = google.calendar({version: 'v3', oauth2Client});
+  //   calendar.events.list({
+  //     calendarId: 'primary',
+  //     singleEvents:true,
+  //   },(err, res) => {
+  //     if (err) return console.log('The API returned an error: ' + err);
+  //     const events = res.data.items;
+  //     if (events.length) {
+  //       console.log('events:');
+  //       all_events.push(events)
+  //       events.map((event, i) => {
+  //         const start = event.start.dateTime || event.start.date;
+  //         console.log(`${start} - ${event.summary}`);
+  //       });
+  //     } else {
+  //       console.log('No upcoming events found.');
+  //     }
+  //   }
+  //   )
+  // }
+
+  all_events = [[{end: {dateTime: "2019-05-01T17:00:00-05:00"},
+  start: {dateTime: "2019-05-01T15:00:00-05:00"}}]]
   
- 
+  const result = corealg2.findslots(userDefs, all_events, emails.length)
+
+
+  console.log('the final meeting time is', result[0])
   
-  console.log(tokens);
-  res.end();
+  //console.log(tokens);
+  res.send(result[0]);
 });
 
 app.get('/add', (req, res) => {
@@ -153,7 +175,6 @@ app.get('/oauthcallback', async (req, res) => {
     tokens = (await oauth2Client.getToken(code)).tokens;
   } catch (e) {
     console.log(e);
-    return;
   }
 
   const oauth_info = await request("https://www.googleapis.com/oauth2/v1/userinfo?fields=email&oauth_token=" + tokens.access_token);
@@ -162,8 +183,7 @@ app.get('/oauthcallback', async (req, res) => {
   db.collection("integrations").add({
     type: "Google",
     display: userEmail,
-    uid: state,
-    token: tokens.refresh_token
+    uid: state
   });
 
   res.writeHead(302, {

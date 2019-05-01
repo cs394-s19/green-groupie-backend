@@ -1,17 +1,24 @@
-const corealg = require('./scheduling-engine/core-algorithm');
+const corealg = require('./core-algorithm');
 
-function findSlots(freeSlots) {
-    console.log('ITS HERE')
-    const chunks = getUserDefs()
-    const freeChunks = getFreeChunks(chunks);
-    const proposedSlots = matchChunks(freeChunks);
-    proposedSlots.forEach(function (proposedSlot) {
-        if (JSON.stringify(proposedSlot) in freeSlots) {
-            freeSlots[JSON.stringify(proposedSlot)] = freeSlots[JSON.stringify(proposedSlot)] +1;
+module.exports = {
+    findslots: function findSlots(userDef, all_events, numUser) {
+        let meeting = []
+        for (let i = 0; i< numUser; i++){
+            const chunks = corealg.divideChunks(all_events[i],userDef)
+            if (meeting.length){
+                meeting.forEach(temp =>{
+                    if (!chunks.includes(temp)){
+                        let index = meeting.indexOf(temp)
+                        meeting.splice(index, 1)
+                    } 
+                })
+            }
+            else{ 
+                meeting = chunks
+            }
         }
-        else {
-            freeSlots[JSON.stringify(proposedSlot)] = 1;
-        }
-    });
-    return freeSlots
+
+        console.log('the meetings are', meeting)
+        return meeting
+    }
 }

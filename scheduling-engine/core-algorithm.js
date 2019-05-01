@@ -3,10 +3,11 @@ let moment = require('moment');
 
 module.exports = {
     // Divide free chunks into free time slots where each slot is the length of the meeting.
-    divideChunks: function divideChunks(userDefs){
+    divideChunks: function divideChunks(events,userDefs){
         let meeting= []
         console.log('the userdefs are,', userDefs)
-        const events = getEventsList()
+        console.log('the events are', events)
+        //const events = getEventsList()
         const duration = userDefs.duration * 60000
         console.log('the duration is', duration)
         const freeChunks = getFreeChunks(events, userDefs)
@@ -43,30 +44,32 @@ module.exports = {
                 }
             }
         });
-        console.log('the meetings are', meeting)
+        //console.log('the meetings are', meeting)
 
         // It returns the UTC time!!!
         return meeting
     },
+
+    getEventsLists: function getEventsList() {
+        return [{end: {dateTime: "2019-05-01T17:00:00-05:00"},
+                start: {dateTime: "2019-05-01T15:00:00-05:00"}}]
+                //{end: {dateTime: "2019-04-17T21:33:00-05:00"},
+                //start: {dateTime: "2019-04-17T21:00:00-05:00"}}]
+                // {end: {dateTime: "2019-04-17T10:30:00-05:00"},
+                // start: {dateTime: "2019-04-17T07:00:00-05:00"}}]
+        // {end: {dateTime: "2019-04-24T08:40:00-05:00"}, start: {dateTime: "2019-04-T22:10:00-05:00"}}]
+                // {end: {dateTime: "2019-04-24T15:33:00-05:00"}, start: {dateTime: "2019-04-24T14:00:00-05:00"}},
+                // {end: {dateTime: "2019-04-01T15:55:00-05:00"}, start: {dateTime: "2019-04-01T14:10:00-05:00"}},
+                // {end: {dateTime: "2019-04-02T07:00:00-05:00"}, start: {dateTime: "2019-04-01T20:20:00-05:00"}},
+                // // {end: {date: "2017-03-28"}, start: {date: "2017-03-26"}}
+                // {end: {dateTime: "2019-04-17T17:10:00-05:00"}, start: {dateTime: "2019-04-17T08:40:00-05:00"}},
+                // {end: {dateTime: "2019-04-18T07:55:00-05:00"}, start: {dateTime: "2019-04-18T06:15:00-05:00"}},
+                // {end: {dateTime: "2019-04-26T18:45:00-05:00"}, start: {dateTime: "2019-04-26T17:06:00-05:00"}}]
+    }
 }
 
 
-function getEventsList() {
-    return [{end: {dateTime: "2019-04-23T09:00:00-05:00"},
-            start: {dateTime: "2019-04-23T08:00:00-05:00"}}]
-            //{end: {dateTime: "2019-04-17T21:33:00-05:00"},
-            //start: {dateTime: "2019-04-17T21:00:00-05:00"}}]
-            // {end: {dateTime: "2019-04-17T10:30:00-05:00"},
-            // start: {dateTime: "2019-04-17T07:00:00-05:00"}}]
-    // {end: {dateTime: "2019-04-24T08:40:00-05:00"}, start: {dateTime: "2019-04-T22:10:00-05:00"}}]
-            // {end: {dateTime: "2019-04-24T15:33:00-05:00"}, start: {dateTime: "2019-04-24T14:00:00-05:00"}},
-            // {end: {dateTime: "2019-04-01T15:55:00-05:00"}, start: {dateTime: "2019-04-01T14:10:00-05:00"}},
-            // {end: {dateTime: "2019-04-02T07:00:00-05:00"}, start: {dateTime: "2019-04-01T20:20:00-05:00"}},
-            // // {end: {date: "2017-03-28"}, start: {date: "2017-03-26"}}
-            // {end: {dateTime: "2019-04-17T17:10:00-05:00"}, start: {dateTime: "2019-04-17T08:40:00-05:00"}},
-            // {end: {dateTime: "2019-04-18T07:55:00-05:00"}, start: {dateTime: "2019-04-18T06:15:00-05:00"}},
-            // {end: {dateTime: "2019-04-26T18:45:00-05:00"}, start: {dateTime: "2019-04-26T17:06:00-05:00"}}]
-}
+
 
 // function findSlots(freeSlots) {
 //     console.log('ITS HERE')
@@ -158,6 +161,7 @@ function getTotalChunks(events, userDefs) {
 
 function getFreeChunks(events, userDefs) {
     const freeChunks = [];
+    console.log('222 the events are ', events)
     const totalChunks = getTotalChunks(events, userDefs);
     console.log('the total chunks are', totalChunks);
     const window = userDefs;
@@ -253,14 +257,6 @@ function stringToDate(x){
 
 function dateToString(x){
     return new Date(x)
-}
-
-
-
-
-//Store the person's free timeslots into Firebase
-function storeFirebase(){
-    
 }
 
 
