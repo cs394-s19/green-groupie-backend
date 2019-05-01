@@ -130,7 +130,7 @@ app.get('/add', (req, res) => {
 
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/calendar.readonly', 'openid', 'profile', 'email'],
+    scope: ['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar.events.readonly', 'openid', 'profile', 'email'],
     state: uid
   });
 
