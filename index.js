@@ -152,7 +152,7 @@ app.get('/add', (req, res) => {
 
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/calendar.readonly', 'openid', 'profile', 'email'],
+    scope: ['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/calendar.events.readonly', 'openid', 'profile', 'email'],
     state: uid
   });
 
@@ -180,7 +180,9 @@ app.get('/oauthcallback', async (req, res) => {
   const oauth_info = await request("https://www.googleapis.com/oauth2/v1/userinfo?fields=email&oauth_token=" + tokens.access_token);
   const {email: userEmail} = JSON.parse(oauth_info);
 
-  db.collection("integrations").add({
+  console.log(tokens);
+
+  db.collection("profile-data").doc(state).collection('integrations').add({
     type: "Google",
     display: userEmail,
     uid: state
