@@ -106,29 +106,29 @@ app.post('/match-meeting-time', async (req,res)=>{
     'http://' + REDIR_HOSTNAME + '/oauthcallback'
   );
 
-  // for (const token of Object.values(tokens)){
-  //   oauth2Client.setCredentials(token);
-  //   console.log('token is', token)
-  //   const calendar = google.calendar({version: 'v3', oauth2Client});
-  //   calendar.events.list({
-  //     calendarId: 'primary',
-  //     singleEvents:true,
-  //   },(err, res) => {
-  //     if (err) return console.log('The API returned an error: ' + err);
-  //     const events = res.data.items;
-  //     if (events.length) {
-  //       console.log('events:');
-  //       all_events.push(events)
-  //       events.map((event, i) => {
-  //         const start = event.start.dateTime || event.start.date;
-  //         console.log(`${start} - ${event.summary}`);
-  //       });
-  //     } else {
-  //       console.log('No upcoming events found.');
-  //     }
-  //   }
-  //   )
-  // }
+  for (const token of Object.values(tokens)){
+    oauth2Client.setCredentials(token);
+    console.log('token is', token)
+    const calendar = google.calendar({version: 'v3', oauth2Client});
+    calendar.events.list({
+      calendarId: 'primary',
+      singleEvents:true,
+    },(err, res) => {
+      if (err) return console.log('The API returned an error: ' + err);
+      const events = res.data.items;
+      if (events.length) {
+        console.log('events:');
+        all_events.push(events)
+        events.map((event, i) => {
+          const start = event.start.dateTime || event.start.date;
+          console.log(`${start} - ${event.summary}`);
+        });
+      } else {
+        console.log('No upcoming events found.');
+      }
+    }
+    )
+  }
 
   all_events = [[{end: {dateTime: "2019-05-01T17:00:00-05:00"},
   start: {dateTime: "2019-05-01T15:00:00-05:00"}}]]
